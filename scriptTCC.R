@@ -22,7 +22,7 @@ library(ggplot2)
 library(mgcv)
 library(lmtest)
 
-setwd('C:/Users/João Marcos/OneDrive/Documentos/R/TCC')
+#setwd('C:/Users/João Marcos/OneDrive/Documentos/R/TCC')
 
 dadosTCC <- read_excel('DadosTCC.xlsx')
 dadosTCC
@@ -54,7 +54,6 @@ GVar <- GVar_hp$cycle
 YVar <- YVar_hp$cycle
 
 df_dadosTCC <- data.frame(date, s, b, GVar, YVar)
-
 
 shift<-function(x,shift_by){
   stopifnot(is.numeric(shift_by))
@@ -90,7 +89,34 @@ shapiro.test(modeloP$residuals)
 modeloP$coefficients
 modeloP$se
 
-df_modeloP <- 
+############# plots ###################################
+ggplot(df_dadosTCC, 
+      aes(x=date, 
+          y=b,
+          xmin = as.Date('2001-12-01', '%Y-%m-%d'),
+          xmax = as.Date('2021-05-01', '%Y-%m-%d'),
+          )
+      ) + 
+  geom_line(size = 1) +
+  scale_x_date(date_labels = '%b/%Y', date_breaks = '12 months') +
+  theme(axis.text.x = element_text(angle=45, hjust=1.)) +
+  #coord_cartesian(xlim = c('12/01','05/21')) +
+  labs(x = 'Tempo',
+       y = 'DLSP(%)')
+
+ggplot(df_dadosTCC, 
+       aes(x=date, 
+           y=s,
+           xmin = as.Date('2001-12-01', '%Y-%m-%d'),
+           xmax = as.Date('2021-05-01', '%Y-%m-%d'),
+       )
+) + 
+  geom_line(size = 1) +
+  scale_x_date(date_labels = '%b/%Y', date_breaks = '12 months') +
+  theme(axis.text.x = element_text(angle=45, hjust=1.)) +
+  #coord_cartesian(xlim = c('12/01','05/21')) +
+  labs(x = 'Tempo',
+       y = 'Resultado Primário (%)')
 
 plot(modeloP, pages=1, residual=TRUE)
 plot(modeloP, pages=1, seWithMean=TRUE, xlab = 'Data')
