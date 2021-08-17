@@ -116,7 +116,11 @@ ggplot(df_dadosTCC,
   theme(axis.text.x = element_text(angle=45, hjust=1.)) +
   #coord_cartesian(xlim = c('12/01','05/21')) +
   labs(x = 'Tempo',
-       y = 'Resultado Primário (%)')
+       y = 'Resultado Primário (%)') +
+  geom_smooth(method = 'gam', se = FALSE )
+
+ggplot()
+
 
 plot(modeloP, pages=1, residual=TRUE)
 plot(modeloP, pages=1, seWithMean=TRUE, xlab = 'Data')
