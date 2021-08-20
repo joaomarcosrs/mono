@@ -58,7 +58,7 @@ YVar <- YVar_hp$cycle
 #Organização em um data frame
 df_dadosTCC <- data.frame(date, s, b, GVar, YVar)
 
-#Função para criar o lag
+#Função para criar o lag da variável DLSP
 shift<-function(x,shift_by){
   stopifnot(is.numeric(shift_by))
   stopifnot(is.numeric(x))
@@ -80,11 +80,16 @@ df_dadosTCC$blag <- shift(df_dadosTCC$b,-1)
 df_dadosTCC$time <- c(1:nrow(df_dadosTCC))
 attach(df_dadosTCC)
 
+#lag da data
+date_df <- data.frame(date)
+date_lag <- date_df[-1,]
+
 # Criando o modelo com o lag para evitar endogeneidade
 modelo <- s ~ blag + GVar + YVar + s(time, by=blag)
 
 #Usando o gam para spline
 modeloP <- gam(modelo, data = df_dadosTCC)
+
 #Estatística de teste
 summary(modeloP)
 #Teste de Durbin-watson
