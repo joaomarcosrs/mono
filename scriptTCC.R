@@ -22,7 +22,6 @@ library(ggplot2)
 library(mgcv)
 library(lmtest)
 
-#setwd('C:/Users/João Marcos/OneDrive/Documentos/R/TCC')
 
 dadosTCC <- read_excel('DadosTCC.xlsx')
 dadosTCC
@@ -43,10 +42,6 @@ class(date)
 
 GVar_hp <- hpfilter(DespesaTotal, freq = 14400, type=c("lambda"), drift = FALSE)
 YVar_hp <- hpfilter(ReceitaTotal, freq = 14400, type=c("lambda"), drift = FALSE)
-
-plot(GVar_hp)
-show(GVar_hp)
-
 
 b <- DLSP
 s <- ResultadoPrimario
@@ -81,6 +76,11 @@ attach(df_dadosTCC)
 modelo <- s ~ blag + GVar + YVar + s(time, by=blag)
 
 modeloP <- gam(modelo, data = df_dadosTCC)
+
+attach(modeloP)
+df_modeloP <- data.frame(modeloP)
+
+
 
 summary(modeloP)
 dwtest(modeloP)
