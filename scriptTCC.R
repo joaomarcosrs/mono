@@ -12,7 +12,10 @@ rm(list=ls())
 #  install.packages('npreg')
 #if(!require(ggplot2))
 #  install.packages('ggplot2')
+#if(!require(itsadug))
+#  install.packages('itsadug')
 
+########################### Pacotes #########################################
 library(readxl)
 library(tidyverse)
 library(mFilter)
@@ -21,12 +24,13 @@ library(npreg)
 library(ggplot2)
 library(mgcv)
 library(lmtest)
+library(itsadug)
 
-
-dadosTCC <- read_excel('DadosTCC.xlsx')
-dadosTCC
+#Leitura dos dados em xlsx
+dadosTCC <- read_excel('Dados.xlsx')
 attach(dadosTCC)
 
+# Criando as classes
 date <- as.Date(Date)
 class(ResultadoPrimario)
 class(DLSP)
@@ -40,16 +44,21 @@ class(date)
 #14400######Ahumada e  Garegnani,  1999; Balcilar,  2009
 #129600#####Ravn e Uhlig (2002)
 
+
+#Remoção da tendência das séries DLSP e Resultado Primário
 GVar_hp <- hpfilter(DespesaTotal, freq = 14400, type=c("lambda"), drift = FALSE)
 YVar_hp <- hpfilter(ReceitaTotal, freq = 14400, type=c("lambda"), drift = FALSE)
 
+#Definição das varáveis 
 b <- DLSP
 s <- ResultadoPrimario
 GVar <- GVar_hp$cycle
 YVar <- YVar_hp$cycle
 
+#Organização em um data frame
 df_dadosTCC <- data.frame(date, s, b, GVar, YVar)
 
+#Função para criar o lag
 shift<-function(x,shift_by){
   stopifnot(is.numeric(shift_by))
   stopifnot(is.numeric(x))
@@ -67,29 +76,26 @@ shift<-function(x,shift_by){
     out<-x
   out
 }
-
 df_dadosTCC$blag <- shift(df_dadosTCC$b,-1)
 df_dadosTCC$time <- c(1:nrow(df_dadosTCC))
 attach(df_dadosTCC)
 
-
+# Criando o modelo com o lag para evitar endogeneidade
 modelo <- s ~ blag + GVar + YVar + s(time, by=blag)
 
+#Usando o gam para spline
 modeloP <- gam(modelo, data = df_dadosTCC)
-
-attach(modeloP)
-df_modeloP <- data.frame(modeloP)
-
-
-
+#Estatística de teste
 summary(modeloP)
+#Teste de Durbin-watson
 dwtest(modeloP)
+#Teste Shapiro
 shapiro.test(modeloP$residuals)
 
-modeloP$coefficients
-modeloP$se
 
-############# plots ###################################
+########################## plots ###################################
+
+#Plot da DLSP
 ggplot(df_dadosTCC, 
       aes(x=date, 
           y=b,
@@ -104,6 +110,7 @@ ggplot(df_dadosTCC,
   labs(x = 'Tempo',
        y = 'DLSP(%)')
 
+#Plot do Resultado Primário
 ggplot(df_dadosTCC, 
        aes(x=date, 
            y=s,
@@ -119,9 +126,8 @@ ggplot(df_dadosTCC,
        y = 'Resultado Primário (%)') +
   geom_smooth(method = 'gam', se = FALSE )
 
-ggplot()
 
-
+# Plots testes do modelo estimado
 plot(modeloP, pages=1, residual=TRUE)
 plot(modeloP, pages=1, seWithMean=TRUE, xlab = 'Data')
 plot(modeloP,pages=1,scheme=1,unconditional=TRUE)
