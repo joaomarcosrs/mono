@@ -43,7 +43,7 @@ class(ResultadoPrimario)
 class(DLSP)
 class(ReceitaTotal)
 class(DespesaTotal)
-class(date)
+class(Date)
 
 
 #Frequencia HP-filter
@@ -101,11 +101,11 @@ attach(df_dadosTCC)
 
 #lag da data
 date_df <- data.frame(date)
-date_lag <- data.frame(date_df[-1, ], )
+date_lag <- date_df[-1, ]
 
 
 # Criando o modelo com o lag para evitar endogeneidade
-modelo <- s ~ blag + GVar + YVar + s(time, by = blag)
+modelo <- s ~ blag + GVar + YVar + s(time, by=blag)
 
 #Usando o gam para spline
 modeloP <- gam(modelo, data = df_dadosTCC)
@@ -118,6 +118,8 @@ summary(modeloP)
 dwtest(modeloP)
 #Teste Shapiro
 shapiro.test(modeloP$residuals)
+
+
 
 
 ########################## plots ###################################
@@ -154,20 +156,31 @@ ggplot(df_dadosTCC,
   geom_smooth(method = 'gam', se = FALSE)
 
 #plot Coeficiente de reação fiscal
-
+ggplot(df_dadosTCC,
+       aes(
+         x = date,
+         y = modeloP,
+         xmin = as.Date('2001-12-01', '%Y-%m-%d'),
+         xmax = as.Date('2021-05-01', '%Y-%m-%d'),
+       )) +
+  geom_line(size = 1) +
+  scale_x_date(date_labels = '%b/%Y', date_breaks = '12 months') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1.)) +
+  #coord_cartesian(xlim = c('12/01','05/21')) +
+  labs(x = 'Tempo',
+       y = 'Resultado Primário (%)') +
+  geom_smooth(method = 'gam', se = FALSE)
 
 
 # Testes plots do modelo estimado
-plot(modeloP, pages = 1, residual = TRUE)
-plot(modeloP,modeloP,
+date_lag
+modeloP$model$datelag <- as.Date(date_lag)
+plot(modeloP,
      pages = 1,
      seWithMean = TRUE,
      xlab = 'Date')
-plot(modeloP,
-     pages = 1,
-     scheme = 1,
-     unconditional = TRUE
-     )
+
+matplot(modeloP, type = "l")
 
 #plotdata <- visreg(modeloP, type = "contrast", plot = FALSE)
 
