@@ -175,12 +175,9 @@ ggplot(df_dadosTCC,
 # Testes plots do modelo estimado
 date_lag
 modeloP$model$datelag <- as.Date(date_lag)
-plot(modeloP,
-     pages = 1,
-     seWithMean = TRUE,
-     xlab = 'Date')
+plot(modeloP)
 
-matplot(modeloP, type = "l")
+plot.gam(modeloP, residuals = FALSE)
 
 #plotdata <- visreg(modeloP, type = "contrast", plot = FALSE)
 
