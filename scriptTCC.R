@@ -14,6 +14,10 @@ rm(list = ls())
 #  install.packages('ggplot2')
 #if(!require(itsadug))
 #  install.packages('itsadug')
+#if(!require(visreg))
+#  install.packages('visreg')
+#if(!require(plyr))
+#  install.packages('plyr')
 
 ########################### Pacotes #########################################
 library(readxl)
@@ -25,6 +29,9 @@ library(ggplot2)
 library(mgcv)
 library(lmtest)
 library(itsadug)
+library(visreg)
+library(plyr)
+
 
 #Leitura dos dados em xlsx
 dadosTCC <- read_excel('Dados.xlsx')
@@ -94,15 +101,16 @@ attach(df_dadosTCC)
 
 #lag da data
 date_df <- data.frame(date)
-date_lag <- date_df[-1, ]
+date_lag <- data.frame(date_df[-1, ], )
+
 
 # Criando o modelo com o lag para evitar endogeneidade
 modelo <- s ~ blag + GVar + YVar + s(time, by = blag)
 
 #Usando o gam para spline
 modeloP <- gam(modelo, data = df_dadosTCC)
+attach(modeloP)
 
-modeloP
 
 #Estatística de teste
 summary(modeloP)
@@ -145,17 +153,21 @@ ggplot(df_dadosTCC,
        y = 'Resultado Primário (%)') +
   geom_smooth(method = 'gam', se = FALSE)
 
+#plot Coeficiente de reação fiscal
 
-# Plots testes do modelo estimado
+
+
+# Testes plots do modelo estimado
 plot(modeloP, pages = 1, residual = TRUE)
-plot(modeloP,
+plot(modeloP,modeloP,
      pages = 1,
      seWithMean = TRUE,
-     xlab = 'Data')
+     xlab = 'Date')
 plot(modeloP,
      pages = 1,
      scheme = 1,
-     unconditional = TRUE)
+     unconditional = TRUE
+     )
 
-
+#plotdata <- visreg(modeloP, type = "contrast", plot = FALSE)
 
