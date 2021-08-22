@@ -43,8 +43,7 @@ class(ResultadoPrimario)
 class(DLSP)
 class(ReceitaTotal)
 class(DespesaTotal)
-class(Date)
-
+class(date)
 
 #Frequencia HP-filter
 #640########Hodrick e Prescott (1997, p.6)
@@ -77,7 +76,7 @@ YVar <- YVar_hp$cycle
 #Organização em um data frame
 df_dadosTCC <- data.frame(date, s, b, GVar, YVar)
 
-#Função para criar o lag da variável DLSP
+#Função para criar o lag da variável DLSP,time e data
 shift <- function(x, shift_by) {
   stopifnot(is.numeric(shift_by))
   stopifnot(is.numeric(x))
@@ -100,8 +99,8 @@ df_dadosTCC$time <- c(1:nrow(df_dadosTCC))
 attach(df_dadosTCC)
 
 #lag da data
-date_df <- data.frame(date)
-date_lag <- date_df[-1, ]
+#date_df <- data.frame(date)
+#date_lag <- date_df[-1,]
 
 
 # Criando o modelo com o lag para evitar endogeneidade
@@ -156,28 +155,35 @@ ggplot(df_dadosTCC,
   geom_smooth(method = 'gam', se = FALSE)
 
 #plot Coeficiente de reação fiscal
-ggplot(df_dadosTCC,
-       aes(
-         x = date,
-         y = modeloP,
-         xmin = as.Date('2001-12-01', '%Y-%m-%d'),
-         xmax = as.Date('2021-05-01', '%Y-%m-%d'),
-       )) +
+ggplot(df_dadosTCC, aes(x = seq_data, y = modeloP)) +
   geom_line(size = 1) +
   scale_x_date(date_labels = '%b/%Y', date_breaks = '12 months') +
   theme(axis.text.x = element_text(angle = 45, hjust = 1.)) +
   #coord_cartesian(xlim = c('12/01','05/21')) +
   labs(x = 'Tempo',
-       y = 'Resultado Primário (%)') +
-  geom_smooth(method = 'gam', se = FALSE)
+       y = 'Coeficiente')
 
 
-# Testes plots do modelo estimado
-date_lag
-modeloP$model$datelag <- as.Date(date_lag)
-plot(modeloP)
+# Plot do coeficiente de reação
+seq_data <- data.frame(dates = c('2001-12-01', '2003-01-01', '2004-02-01', '2005-03-01', '2006-04-01',
+                                 '2007-05-01', '2008-06-01', '2009-07-01', '2010-08-01', '2011-09-01',
+                                 '2012-10-01', '2013-11-01', '2014-12-01', '2016-01-01', '2017-02-01',
+                                 '2018-03-01', '2019-04-01', '2020-05-01'),
+                       values = 1:18)
 
-plot.gam(modeloP, residuals = FALSE)
+data_new <- seq_data                                          
+data_new$dates <- as.Date(data_new$dates)                 
+data_new <- data_new[order(data_new$dates), ]             
+data_new
 
-#plotdata <- visreg(modeloP, type = "contrast", plot = FALSE)
+plot(modeloP, xaxt = 'n', yaxt='n', xlab = ' ')
+mtext('Data', side = 1, line = 3)
+xtick <- seq(1, 234, by = 13)
+axis(1, at = xtick, labels = format(data_new$dates, '%b\n%Y'), las = 1, cex.axis = .8)
+axis(2, las=1, cex.axis=.8)
+
+
+
+
+
 
