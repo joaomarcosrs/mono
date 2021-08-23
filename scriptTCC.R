@@ -181,8 +181,8 @@ mtext('Data', side = 1, line = 3)
 xtick <- seq(1, 234, by = 13)
 axis(1, at = xtick, labels = format(data_new$dates, '%b\n%Y'), las = 1, cex.axis = .8)
 axis(2, las=1, cex.axis=.8)
-
-
+abline(h=0, lty = 3)
+abline(v=c(122, 164), lty = 2, col= 'blue')
 
 
 
