@@ -154,16 +154,6 @@ ggplot(df_dadosTCC,
        y = 'Resultado Primário (%)') +
   geom_smooth(method = 'gam', se = FALSE)
 
-#plot Coeficiente de reação fiscal
-ggplot(df_dadosTCC, aes(x = seq_data, y = modeloP)) +
-  geom_line(size = 1) +
-  scale_x_date(date_labels = '%b/%Y', date_breaks = '12 months') +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1.)) +
-  #coord_cartesian(xlim = c('12/01','05/21')) +
-  labs(x = 'Tempo',
-       y = 'Coeficiente')
-
-
 # Plot do coeficiente de reação
 seq_data <- data.frame(dates = c('2001-12-01', '2003-01-01', '2004-02-01', '2005-03-01', '2006-04-01',
                                  '2007-05-01', '2008-06-01', '2009-07-01', '2010-08-01', '2011-09-01',
@@ -181,7 +171,7 @@ mtext('Data', side = 1, line = 3)
 xtick <- seq(1, 234, by = 13)
 axis(1, at = xtick, labels = format(data_new$dates, '%b\n%Y'), las = 1, cex.axis = .8)
 axis(2, las=1, cex.axis=.8)
-abline(h=0, lty = 3)
+abline(h=0, lty = 3, col = 'red')
 abline(v=c(122, 164), lty = 2, col= 'blue')
 
 
