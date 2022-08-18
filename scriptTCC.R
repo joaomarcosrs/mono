@@ -175,5 +175,20 @@ abline(h=0, lty = 3, col = 'red')
 abline(v=c(122, 164), lty = 2, col= 'blue')
 
 
+ggplot(df_dadosTCC, aes(x = date,)) +
+  geom_point(aes(y=b, colour = 'DLSP')) +
+  geom_point(aes(y=s, colour = 'Superávit Primário')) +
+  scale_colour_manual('',
+                      breaks = c('DLSP', 'Superávit Primário'),
+                      values = c('red', 'blue'))+
+  labs(title = 'DLSP e Superávit Primário - dez/2001 a mai/2021',
+       x = 'Tempo', 
+       y = 'Resultado Fiscal (%)',
+       color = 'Legenda\n') +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+cor.test(b,s)
+  
 
 
